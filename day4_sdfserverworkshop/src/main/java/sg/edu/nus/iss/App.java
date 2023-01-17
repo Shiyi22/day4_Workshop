@@ -1,13 +1,15 @@
 package sg.edu.nus.iss;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -30,7 +32,7 @@ public final class App {
         File newDirectory = new File(dirPath); 
 
         if (newDirectory.exists()) {
-            System.out.println("Directory exists");
+            System.out.println("Directory already exists");
             System.out.println();
         } else {
             newDirectory.mkdir(); 
@@ -50,14 +52,30 @@ public final class App {
             DataInputStream dis = new DataInputStream(bis); 
             String msgReceived = ""; 
 
-            while (!msgReceived.equals("close")) {
-                msgReceived = dis.readUTF(); 
+            try (OutputStream os = sock.getOutputStream()) {
+                BufferedOutputStream bos = new BufferedOutputStream(os);
+                DataOutputStream dos = new DataOutputStream(bos); 
                 
-                if (msgReceived.equalsIgnoreCase("get-cookie")) {
-                    String cookieValue = cookie.returnCookie(); 
-                }
-            }
+                while (!msgReceived.equals("close")) {
+                    msgReceived = dis.readUTF(); 
+                    
+                    if (msgReceived.equalsIgnoreCase("get-cookie")) {
+                        String cookieValue = cookie.returnCookie(); 
+                        System.out.println(cookieValue);
 
+                        dos.writeUTF(cookieValue);
+                        dos.flush();
+                    }
+                }
+                dos.close();
+                bos.close();
+                os.close();
+            } catch (EOFException ex) {
+                ex.printStackTrace();; 
+            }
+            bis.close();
+            dis.close();
+            is.close();
         } catch (EOFException ex) { // handing EOF exception 
             sock.close(); 
             server.close(); 
