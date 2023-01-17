@@ -1,5 +1,7 @@
 package sg.edu.nus.iss;
 
+import java.io.File;
+
 /**
  * Hello world!
  */
@@ -12,6 +14,13 @@ public final class App {
      * @param args The arguments of the program.
      */
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        String dirPath = "./data2"; 
+        File newDirectory = new File(dirPath); 
+
+        if (newDirectory.exists()) {
+            System.out.println("Directory exists");
+        } else {
+            newDirectory.mkdir(); 
+        }
     }
 }
