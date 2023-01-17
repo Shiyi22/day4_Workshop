@@ -18,10 +18,11 @@ public class Cookie {
     List<String> cookieItems = null; 
 
     // function #1 
-    public void readCookieFile() throws FileNotFoundException {
+    public void readCookieFile() throws FileNotFoundException, IOException {
         cookieItems = new ArrayList<>();
         File file = new File(dirPath + File.separator + fileName);
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        FileReader fr = new FileReader(file); 
+        BufferedReader br = new BufferedReader(fr);
         String readString; 
 
         try {
@@ -31,6 +32,9 @@ public class Cookie {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } finally {
+            br.close(); 
+            fr.close(); 
         }
     }
     // function #2 
